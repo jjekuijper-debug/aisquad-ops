@@ -686,6 +686,7 @@ body {
   </div>
   <div class="header-right">
     <div class="live-pill"><div class="live-dot"></div>Live</div>
+    <span id="last-sync" style="font-size:11px;color:var(--ink-dim);margin-left:4px"></span>
   </div>
 </div>
 
@@ -893,6 +894,9 @@ body {
     }
   }
 })();
+// LIVE DATA INJECTION — replaced by n8n App Data Sync workflow
+const LIVE_DATA = null; // INJECT_MARKER
+
 // ── STORAGE (in-memory with localStorage persistence) ─────────────
 let tasks = [], approvals = [], workflows = [], spendData = { daily: 0, monthly: 0, log: [] };
 let taskFilter = 'all', approvalFilter = 'all', agentFilter = 'all', dashAgentFilter = 'all', approvalAgentFilter = 'all';
@@ -907,6 +911,13 @@ function save() {
 }
 
 function load() {
+  if (window.LIVE_DATA) {
+    tasks = LIVE_DATA.tasks || defaultTasks();
+    approvals = LIVE_DATA.approvals || defaultApprovals();
+    workflows = LIVE_DATA.workflows || defaultWorkflows();
+    spendData = LIVE_DATA.spend || { daily: 0, monthly: 0, log: [] };
+    return;
+  }
   try {
     tasks = JSON.parse(localStorage.getItem('sq_tasks') || 'null') || defaultTasks();
     approvals = JSON.parse(localStorage.getItem('sq_approvals') || 'null') || defaultApprovals();
@@ -915,6 +926,15 @@ function load() {
   } catch(e) {
     tasks = defaultTasks(); approvals = defaultApprovals();
     workflows = defaultWorkflows(); spendData = { daily: 0, monthly: 0, log: [] };
+  }
+}
+
+function updateSyncTime() {
+  const el = document.getElementById('last-sync');
+  if (!el) return;
+  if (window.LIVE_DATA && LIVE_DATA.lastUpdated) {
+    const d = new Date(LIVE_DATA.lastUpdated);
+    el.textContent = 'Synced ' + d.toLocaleTimeString('en-GB', {hour:'2-digit', minute:'2-digit'});
   }
 }
 
@@ -994,6 +1014,7 @@ function renderAll() {
   renderWorkflows();
   renderSpend();
   updateApprovalBadge();
+  updateSyncTime();
 }
 
 function renderDashboard() {
@@ -1160,6 +1181,11 @@ function approveItem(id) {
   a.status = 'approved';
   save(); renderAll();
   showToast('Approved: ' + a.title.substring(0,30));
+  fetch('http://localhost:5678/webhook/approval-response', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({approval_id: id, decision: 'approved', reason: ''})
+  }).catch(()=>{});
 }
 
 function toggleReject(id) {
@@ -1171,6 +1197,11 @@ function toggleReject(id) {
     if (a) { a.status = 'rejected'; a.note = reason; }
     save(); renderAll();
     showToast('Rejected: ' + (approvals.find(a=>a.id===id)||{title:''}).title?.substring(0,25));
+    fetch('http://localhost:5678/webhook/approval-response', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({approval_id: id, decision: 'rejected', reason})
+    }).catch(()=>{});
   } else {
     ri.classList.add('open');
     ri.focus();
