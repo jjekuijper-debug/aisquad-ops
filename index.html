@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>AI-SQUAD OPS</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #F7F5F0;
+  --bg2: #EFEDE8;
+  --surface: #FFFFFF;
+  --surface2: #F7F5F0;
+  --border: #E2DDD6;
+  --border-strong: #C8C2B8;
+  --ink: #1A1714;
+  --ink-mid: #5A554E;
+  --ink-dim: #9A948C;
+  --gold: #B8832A;
+  --gold-light: #FFF4E0;
+  --gold-border: #E8C880;
+  --green: #2A7A4B;
+  --green-light: #EBF7F0;
+  --green-border: #A8D8BC;
+  --red: #C0392B;
+  --red-light: #FEF0EE;
+  --red-border: #F0B8B2;
+  --blue: #2563EB;
+  --blue-light: #EFF6FF;
+  --blue-border: #BFDBFE;
+  --orange: #C2600A;
+  --orange-light: #FFF7ED;
+  --orange-border: #FED7AA;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
+  --shadow: 0 4px 12px rgba(0,0,0,0.08), 0 2px 4px rgba(0,0,0,0.04);
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  font-size: 14px;
+}
+
+/* HEADER */
+.header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 14px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+}
+
+.header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  width: 34px;
+  height: 34px;
+  background: var(--ink);
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 14px;
+  font-weight: 700;
+  color: #F7F5F0;
+  letter-spacing: -0.02em;
+}
+
+.brand-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--ink-dim);
+  font-weight: 400;
+  margin-top: 1px;
+}
+
+.header-right { display: flex; align-items: center; gap: 8px; }
+
+.live-pill {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--green-light);
+  border: 1px solid var(--green-border);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--green);
+}
+
+.live-dot {
+  width: 6px; height: 6px;
+  background: var(--green);
+  border-radius: 50%;
+  animation: blink 2s infinite;
+}
+
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+/* NAV TABS */
+.nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.nav::-webkit-scrollbar { display: none; }
+
+.nav-tab {
+  padding: 13px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-dim);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+  transition: all 0.15s;
+  letter-spacing: 0.01em;
+  position: relative;
+}
+
+.nav-tab:hover { color: var(--ink-mid); }
+.nav-tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+.nav-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--red);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 10px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+/* CONTENT */
+.content { padding: 20px; max-width: 860px; margin: 0 auto; }
+
+/* VIEWS */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.2s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
+
+/* PAGE HEADER */
+.page-hdr {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  gap: 12px;
+}
+
+.page-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.page-date {
+  font-size: 12px;
+  color: var(--ink-dim);
+  margin-top: 2px;
+}
+
+.btn-primary {
+  background: var(--ink);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+  flex-shrink: 0;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-ghost {
+  background: none;
+  color: var(--ink-mid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-ghost:hover { background: var(--bg2); }
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media(max-width:600px){ .stats{grid-template-columns:repeat(2,1fr);} }
+
+.stat {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-l { font-size: 11px; font-weight: 600; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+.stat-v { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; color: var(--ink); line-height: 1; }
+.stat-v.amber { color: var(--gold); }
+.stat-v.emerald { color: var(--green); }
+.stat-v.crimson { color: var(--red); }
+
+/* CARDS */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.card-hdr {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-title { font-size: 12px; font-weight: 700; color: var(--ink-mid); text-transform: uppercase; letter-spacing: 0.06em; }
+
+/* TASK ITEMS */
+.task {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.12s;
+  position: relative;
+}
+.task:last-child { border-bottom: none; }
+.task:hover { background: var(--bg); }
+.task:active { background: var(--bg2); }
+
+/* Status stripe */
+.task::after {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  border-radius: 0;
+}
+.task.todo::after { background: var(--border-strong); }
+.task.in-progress::after { background: var(--gold); }
+.task.done::after { background: var(--green); }
+.task.blocked::after { background: var(--red); }
+
+.task-cb {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  flex-shrink: 0;
+  margin-top: 1px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+  font-size: 11px;
+  font-weight: 700;
+}
+.task.done .task-cb { background: var(--green); border-color: var(--green); color: white; }
+.task.done .task-cb::after { content: '✓'; }
+.task.in-progress .task-cb { border-color: var(--gold); background: var(--gold-light); }
+.task.in-progress .task-cb::after { content: '→'; font-size: 10px; color: var(--gold); }
+.task.blocked .task-cb { border-color: var(--red); background: var(--red-light); color: var(--red); }
+.task.blocked .task-cb::after { content: '!'; }
+
+.task-body { flex: 1; min-width: 0; }
+
+.task-n {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 5px;
+  line-height: 1.3;
+}
+.task.done .task-n { color: var(--ink-dim); text-decoration: line-through; }
+
+.task-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+/* PILLS */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border: 1px solid;
+}
+
+.pill-john { background: var(--blue-light); color: var(--blue); border-color: var(--blue-border); }
+.pill-claude { background: var(--gold-light); color: var(--gold); border-color: var(--gold-border); }
+.pill-jur { background: var(--bg2); color: var(--ink-mid); border-color: var(--border-strong); }
+.pill-runpod { background: var(--orange-light); color: var(--orange); border-color: var(--orange-border); }
+.pill-n8n { background: var(--green-light); color: var(--green); border-color: var(--green-border); }
+
+.pill-todo { background: var(--bg2); color: var(--ink-dim); border-color: var(--border); }
+.pill-in-progress { background: var(--gold-light); color: var(--gold); border-color: var(--gold-border); }
+.pill-done { background: var(--green-light); color: var(--green); border-color: var(--green-border); }
+.pill-blocked { background: var(--red-light); color: var(--red); border-color: var(--red-border); }
+
+.task-time { font-size: 11px; color: var(--ink-dim); }
+.task-cost { font-size: 11px; color: var(--ink-dim); margin-left: auto; }
+
+.task-out {
+  margin-top: 7px;
+  padding: 7px 10px;
+  background: var(--bg);
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  font-size: 12px;
+  color: var(--ink-mid);
+  line-height: 1.4;
+}
+
+/* PHASE DIVIDER */
+.phase-div {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--ink-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 12px 16px 6px;
+  border-top: 1px solid var(--border);
+}
+.phase-div:first-child { border-top: none; padding-top: 6px; }
+
+/* FILTER BAR */
+.filters {
+  display: flex; gap: 6px;
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+  padding-bottom: 2px; margin-bottom: 16px;
+  scrollbar-width: none;
+}
+.filters::-webkit-scrollbar { display: none; }
+
+.f-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--ink-mid);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+.f-btn:hover, .f-btn.active {
+  background: var(--ink);
+  color: white;
+  border-color: var(--ink);
+}
+
+/* ADD FORM */
+.add-form {
+  background: var(--surface);
+  border: 1px solid var(--gold-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 20px rgba(184,131,42,0.1);
+  display: none;
+}
+.add-form.open { display: block; animation: fadeIn 0.2s ease; }
+
+.frow { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+@media(max-width:500px) { .frow { grid-template-columns: 1fr; } }
+
+.finput {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  color: var(--ink);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.15s;
+}
+.finput:focus { border-color: var(--ink); }
+
+.fselect {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  color: var(--ink-mid);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  width: 100%;
+  cursor: pointer;
+}
+
+.fbtns { display: flex; gap: 8px; margin-top: 4px; }
+
+/* APPROVAL CARDS */
+.approval-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 16px;
+  overflow: hidden;
+  transition: box-shadow 0.15s;
+}
+.approval-card:hover { box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+
+.approval-card.pending { border-left: 4px solid var(--gold); }
+.approval-card.approved { border-left: 4px solid var(--green); opacity: 0.7; }
+.approval-card.rejected { border-left: 4px solid var(--red); opacity: 0.6; }
+
+.appr-hdr {
+  padding: 14px 16px 10px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.appr-type {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ink-dim);
+  margin-bottom: 4px;
+}
+
+.appr-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.appr-time { font-size: 11px; color: var(--ink-dim); flex-shrink: 0; }
+
+.appr-body { padding: 0 16px 14px; }
+
+.appr-preview {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  font-size: 13px;
+  color: var(--ink-mid);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  white-space: pre-wrap;
+}
+
+.appr-meta { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+
+.appr-btns { display: flex; gap: 8px; }
+
+.btn-approve {
+  flex: 1;
+  background: var(--green);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.btn-approve:hover { opacity: 0.85; }
+
+.btn-reject {
+  flex: 1;
+  background: var(--red-light);
+  color: var(--red);
+  border: 1px solid var(--red-border);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.btn-reject:hover { background: var(--red); color: white; }
+
+.btn-view {
+  background: var(--bg2);
+  color: var(--ink-mid);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.approved-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--green-light);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--green);
+  width: 100%;
+  justify-content: center;
+}
+
+.rejected-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: var(--red-light);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--red);
+  width: 100%;
+  justify-content: center;
+}
+
+/* WORKFLOW GRID */
+.wf-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+@media(max-width:500px) { .wf-grid { grid-template-columns: 1fr; } }
+
+.wf-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+.wf-card:hover { box-shadow: var(--shadow); }
+
+.wf-name { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.wf-id { font-size: 10px; color: var(--ink-dim); font-family: monospace; margin-bottom: 8px; }
+.wf-status { display: flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; }
+
+.ws { width: 8px; height: 8px; border-radius: 50%; }
+.ws-active { background: var(--green); }
+.ws-inactive { background: var(--ink-dim); }
+.ws-building { background: var(--gold); animation: blink 1.5s infinite; }
+
+/* SPEND */
+.spend-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 16px;
+}
+
+.spend-hdr { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.spend-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+.spend-amt { font-family: 'Playfair Display', serif; font-size: 18px; font-weight: 700; color: var(--gold); }
+.spend-track { height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+.spend-fill { height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); border-radius: 4px; transition: width 0.4s ease; }
+.spend-fill.warn { background: linear-gradient(90deg, var(--gold), var(--red)); }
+.spend-cap { font-size: 11px; color: var(--ink-dim); }
+
+/* WEBHOOK BOX */
+.wh-box {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 16px;
+}
+.wh-label { font-size: 10px; font-weight: 700; color: var(--ink-dim); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+.wh-url { font-family: monospace; font-size: 12px; color: var(--blue); word-break: break-all; }
+.wh-note { font-size: 11px; color: var(--ink-dim); margin-top: 4px; }
+
+/* EMPTY */
+.empty { text-align: center; padding: 48px 20px; color: var(--ink-dim); font-size: 13px; }
+.empty-icon { font-size: 32px; margin-bottom: 8px; }
+
+/* TOAST */
+.toast {
+  position: fixed;
+  bottom: 20px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--ink);
+  color: white;
+  padding: 11px 20px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: 600;
+  z-index: 9999;
+  opacity: 0;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+}
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+/* REJECT INPUT */
+.reject-input {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--red-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 12px;
+  color: var(--ink);
+  outline: none;
+  margin-bottom: 8px;
+  display: none;
+}
+.reject-input.open { display: block; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="logo">AI</div>
+    <div>
+      <div class="brand-name">AI-SQUAD OPS</div>
+      <div class="brand-sub">Lina Hartmann Pipeline</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="live-pill"><div class="live-dot"></div>Live</div>
+  </div>
+</div>
+
+<div class="nav">
+  <div class="nav-tab active" onclick="switchTab('dashboard')">Dashboard</div>
+  <div class="nav-tab" onclick="switchTab('approvals')">Approvals <span class="nav-badge" id="approval-count">0</span></div>
+  <div class="nav-tab" onclick="switchTab('tasks')">Tasks</div>
+  <div class="nav-tab" onclick="switchTab('workflows')">Workflows</div>
+  <div class="nav-tab" onclick="switchTab('spend')">Spend</div>
+</div>
+
+<div class="content">
+
+  <!-- DASHBOARD -->
+  <div class="view active" id="view-dashboard">
+    <div class="page-hdr">
+      <div>
+        <div class="page-title">Good morning, Jur</div>
+        <div class="page-date" id="today-date"></div>
+      </div>
+      <button class="btn-primary" onclick="openAddForm()">+ Add Task</button>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-l">Done Today</div>
+        <div class="stat-v emerald" id="s-done">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-l">In Progress</div>
+        <div class="stat-v amber" id="s-prog">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-l">Pending</div>
+        <div class="stat-v" id="s-todo">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-l">Spend Today</div>
+        <div class="stat-v amber" id="s-spend">€0.00</div>
+      </div>
+    </div>
+
+    <div class="add-form" id="add-form">
+      <div class="frow">
+        <input class="finput" id="nt-name" placeholder="Task name..." />
+        <select class="fselect" id="nt-agent">
+          <option value="john">John (AI Agent)</option>
+          <option value="claude">Claude Code</option>
+          <option value="jur">Jur (Manual)</option>
+          <option value="runpod">RunPod</option>
+          <option value="n8n">n8n</option>
+        </select>
+      </div>
+      <div class="frow">
+        <select class="fselect" id="nt-phase">
+          <option>Fanvue Setup</option>
+          <option>Image Generation</option>
+          <option>n8n Workflows</option>
+          <option>Social Media</option>
+          <option>Infrastructure</option>
+          <option>Content</option>
+        </select>
+        <select class="fselect" id="nt-status">
+          <option value="todo">Todo</option>
+          <option value="in-progress">In Progress</option>
+          <option value="done">Done</option>
+          <option value="blocked">Blocked</option>
+        </select>
+      </div>
+      <input class="finput" id="nt-output" placeholder="Notes / output (optional)" style="margin-bottom:10px"/>
+      <div class="fbtns">
+        <button class="btn-primary" onclick="addTask()">Add Task</button>
+        <button class="btn-ghost" onclick="closeAddForm()">Cancel</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-title">Active Tasks</div>
+        <button class="btn-ghost" onclick="switchTab('tasks')" style="padding:4px 10px;font-size:11px">View All</button>
+      </div>
+      <div class="filters agent-filters" style="padding:10px 16px 0; border-bottom:1px solid var(--border);">
+        <button class="f-btn active" onclick="filterDashAgent('all',this)">All</button>
+        <button class="f-btn" onclick="filterDashAgent('jur',this)">Jur</button>
+        <button class="f-btn" onclick="filterDashAgent('john',this)">John</button>
+        <button class="f-btn" onclick="filterDashAgent('claude',this)">Claude Code</button>
+        <button class="f-btn" onclick="filterDashAgent('runpod',this)">RunPod</button>
+        <button class="f-btn" onclick="filterDashAgent('n8n',this)">n8n</button>
+      </div>
+      <div id="dash-tasks"></div>
+    </div>
+
+    <div class="wh-box">
+      <div class="wh-label">John's Task Completion Webhook (n8n)</div>
+      <div class="wh-url">POST http://localhost:5678/webhook/task-complete</div>
+      <div class="wh-note">Payload: {task_name, status, agent, output, cost_euros, phase}</div>
+    </div>
+  </div>
+
+  <!-- APPROVALS -->
+  <div class="view" id="view-approvals">
+    <div class="page-hdr">
+      <div>
+        <div class="page-title">Approvals</div>
+        <div class="page-date">Review and approve John's pending requests</div>
+      </div>
+      <button class="btn-primary" onclick="addTestApproval()">+ Test</button>
+    </div>
+
+    <div class="filters status-filters">
+      <button class="f-btn active" onclick="filterApprovals('all',this)">All</button>
+      <button class="f-btn" onclick="filterApprovals('pending',this)">Pending</button>
+      <button class="f-btn" onclick="filterApprovals('approved',this)">Approved</button>
+      <button class="f-btn" onclick="filterApprovals('rejected',this)">Rejected</button>
+    </div>
+    <div class="filters agent-filters">
+      <button class="f-btn active" onclick="filterApprovalsAgent('all',this)">All Agents</button>
+      <button class="f-btn" onclick="filterApprovalsAgent('jur',this)">Jur</button>
+      <button class="f-btn" onclick="filterApprovalsAgent('john',this)">John</button>
+      <button class="f-btn" onclick="filterApprovalsAgent('claude',this)">Claude Code</button>
+      <button class="f-btn" onclick="filterApprovalsAgent('n8n',this)">n8n</button>
+    </div>
+
+    <div id="approvals-list"></div>
+  </div>
+
+  <!-- TASKS -->
+  <div class="view" id="view-tasks">
+    <div class="page-hdr">
+      <div><div class="page-title">All Tasks</div></div>
+      <button class="btn-primary" onclick="openAddForm(); switchTab('dashboard')">+ Add</button>
+    </div>
+    <div class="filters status-filters">
+      <button class="f-btn active" onclick="filterTasks('all',this)">All</button>
+      <button class="f-btn" onclick="filterTasks('todo',this)">Todo</button>
+      <button class="f-btn" onclick="filterTasks('in-progress',this)">In Progress</button>
+      <button class="f-btn" onclick="filterTasks('done',this)">Done</button>
+      <button class="f-btn" onclick="filterTasks('blocked',this)">Blocked</button>
+    </div>
+    <div class="filters agent-filters">
+      <button class="f-btn active" onclick="filterTasksAgent('all',this)">All Agents</button>
+      <button class="f-btn" onclick="filterTasksAgent('jur',this)">Jur</button>
+      <button class="f-btn" onclick="filterTasksAgent('john',this)">John</button>
+      <button class="f-btn" onclick="filterTasksAgent('claude',this)">Claude Code</button>
+      <button class="f-btn" onclick="filterTasksAgent('runpod',this)">RunPod</button>
+      <button class="f-btn" onclick="filterTasksAgent('n8n',this)">n8n</button>
+    </div>
+    <div class="card"><div id="all-tasks"></div></div>
+  </div>
+
+  <!-- WORKFLOWS -->
+  <div class="view" id="view-workflows">
+    <div class="page-hdr"><div><div class="page-title">n8n Workflows</div></div></div>
+    <div class="wf-grid" id="wf-grid"></div>
+  </div>
+
+  <!-- SPEND -->
+  <div class="view" id="view-spend">
+    <div class="page-hdr">
+      <div><div class="page-title">Spend</div></div>
+      <button class="btn-primary" onclick="addSpend()">+ Log</button>
+    </div>
+
+    <div class="spend-card">
+      <div class="spend-hdr">
+        <div class="spend-title">Daily OpenRouter</div>
+        <div class="spend-amt" id="daily-amt">€0.00</div>
+      </div>
+      <div class="spend-track"><div class="spend-fill" id="daily-bar" style="width:0%"></div></div>
+      <div class="spend-cap">Cap: €5.00/day — John pauses above €3.00</div>
+    </div>
+
+    <div class="spend-card">
+      <div class="spend-hdr">
+        <div class="spend-title">Monthly Budget</div>
+        <div class="spend-amt" id="monthly-amt">€0.00</div>
+      </div>
+      <div class="spend-track"><div class="spend-fill" id="monthly-bar" style="width:0%"></div></div>
+      <div class="spend-cap">Budget: €100/month — Phase 3 est. €22–52</div>
+    </div>
+
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">Spend Log</div></div>
+      <div id="spend-log"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STORAGE (in-memory with localStorage persistence) ─────────────
+let tasks = [], approvals = [], workflows = [], spendData = { daily: 0, monthly: 0, log: [] };
+let taskFilter = 'all', approvalFilter = 'all', agentFilter = 'all', dashAgentFilter = 'all', approvalAgentFilter = 'all';
+
+function save() {
+  try {
+    localStorage.setItem('sq_tasks', JSON.stringify(tasks));
+    localStorage.setItem('sq_approvals', JSON.stringify(approvals));
+    localStorage.setItem('sq_workflows', JSON.stringify(workflows));
+    localStorage.setItem('sq_spend', JSON.stringify(spendData));
+  } catch(e) {}
+}
+
+function load() {
+  try {
+    tasks = JSON.parse(localStorage.getItem('sq_tasks') || 'null') || defaultTasks();
+    approvals = JSON.parse(localStorage.getItem('sq_approvals') || 'null') || defaultApprovals();
+    workflows = JSON.parse(localStorage.getItem('sq_workflows') || 'null') || defaultWorkflows();
+    spendData = JSON.parse(localStorage.getItem('sq_spend') || 'null') || { daily: 0, monthly: 0, log: [] };
+  } catch(e) {
+    tasks = defaultTasks(); approvals = defaultApprovals();
+    workflows = defaultWorkflows(); spendData = { daily: 0, monthly: 0, log: [] };
+  }
+}
+
+// ── DEFAULT DATA ──────────────────────────────────────────────────
+function defaultTasks() {
+  return [
+    { id:1, name:'Install Claude Code', status:'done', agent:'jur', phase:'Infrastructure', output:'Installed via winget, running on Windows', cost:0, time:'2026-04-29T09:00:00' },
+    { id:2, name:'Google OAuth (Gmail, Drive, Docs, Sheets)', status:'done', agent:'jur', phase:'Infrastructure', output:'token.json saved to .openclaw/', cost:0, time:'2026-04-29T10:30:00' },
+    { id:3, name:'Build all n8n workflows (9 total)', status:'done', agent:'claude', phase:'n8n Workflows', output:'9 workflows built and imported to n8n', cost:0, time:'2026-04-29T11:00:00' },
+    { id:4, name:'Google Drive credential in n8n', status:'done', agent:'jur', phase:'Infrastructure', output:'Credential ID: ONWL9bKuY8dvrmqM', cost:0, time:'2026-04-29T12:00:00' },
+    { id:5, name:'John Dev Mode system', status:'done', agent:'claude', phase:'Infrastructure', output:'dev-queue, AGENTS.md rules, SKILL.md all created', cost:0, time:'2026-04-29T13:00:00' },
+    { id:6, name:'Caption Bible v1 — 30 days x 4 platforms', status:'done', agent:'claude', phase:'Content', output:'120 captions approved, uploaded to Google Drive', cost:0, time:'2026-04-29T14:00:00' },
+    { id:7, name:'TikTok text overlay workflow', status:'in-progress', agent:'claude', phase:'n8n Workflows', output:'', cost:0, time:'2026-04-29T15:00:00' },
+    { id:8, name:'Generation Prompt Library (14 scenes)', status:'in-progress', agent:'claude', phase:'Image Generation', output:'', cost:0, time:'2026-04-29T15:30:00' },
+    { id:9, name:'Fanvue profile — bio, price, AI checkbox', status:'todo', agent:'jur', phase:'Fanvue Setup', output:'', cost:0, time:'' },
+    { id:10, name:'First image batch — 14 social scenes (RunPod)', status:'todo', agent:'runpod', phase:'Image Generation', output:'', cost:0.35, time:'' },
+    { id:11, name:'End-to-end Instagram post test', status:'todo', agent:'n8n', phase:'Social Media', output:'', cost:0, time:'' },
+    { id:12, name:'Fanvue welcome DM templates', status:'todo', agent:'john', phase:'Fanvue Setup', output:'', cost:0, time:'' },
+    { id:13, name:'Reddit strategy → content-strategy SKILL.md', status:'todo', agent:'claude', phase:'Content', output:'', cost:0, time:'' },
+    { id:14, name:'LivePortrait TikTok setup', status:'todo', agent:'john', phase:'Social Media', output:'', cost:0, time:'' },
+    { id:15, name:'Activate all n8n workflows', status:'todo', agent:'jur', phase:'n8n Workflows', output:'', cost:0, time:'' },
+    { id:16, name:'Task Completion Logger workflow', status:'todo', agent:'claude', phase:'n8n Workflows', output:'', cost:0, time:'' },
+  ];
+}
+
+function defaultApprovals() {
+  return [
+    {
+      id: 1,
+      type: 'Content Post',
+      title: 'Instagram — Day 1 Scene',
+      status: 'pending',
+      agent: 'john',
+      platform: 'Instagram',
+      preview: 'Some people relax after work. I open the engine bay.\n\n#porsche911 #womenengineers #mechaniclife #hamburggirl',
+      imageRef: 'scene_01_seed_2782320719_workshop_bun',
+      time: new Date().toISOString(),
+      note: ''
+    },
+    {
+      id: 2,
+      type: 'Dev Request',
+      title: 'Update content-strategy SKILL.md with Reddit',
+      status: 'pending',
+      agent: 'john',
+      platform: 'System',
+      preview: 'Add Reddit as Phase 4 channel to content-strategy SKILL.md. Reddit converts at 8-15% vs TikTok 1-3%. Add subreddit targeting guide for mechanic/lifestyle niche.',
+      imageRef: null,
+      time: new Date(Date.now() - 3600000).toISOString(),
+      note: ''
+    }
+  ];
+}
+
+function defaultWorkflows() {
+  return [
+    { name:'Instagram Publisher', id:'cf96bcf0', status:'inactive' },
+    { name:'Content Approval Queue', id:'a381d08d', status:'inactive' },
+    { name:'Twitter Publisher', id:'5ddea8f9', status:'inactive' },
+    { name:'Fanvue Content Upload', id:'bc60b53b', status:'inactive' },
+    { name:'Fanvue DM Handler', id:'0b6f8564', status:'inactive' },
+    { name:'Google Drive Sync', id:'5349fdd1', status:'inactive' },
+    { name:'Daily OPS Report', id:'3c50c1f0', status:'inactive' },
+    { name:'RunPod Image Trigger', id:'1eea0ccc', status:'inactive' },
+    { name:'John Dev Mode Handler', id:'a2c61728', status:'inactive' },
+    { name:'Image Quality Check', id:'building', status:'building' },
+    { name:'TikTok Text Overlay', id:'building', status:'building' },
+    { name:'Task Completion Logger', id:'pending', status:'inactive' },
+  ];
+}
+
+// ── RENDER ────────────────────────────────────────────────────────
+function renderAll() {
+  renderDashboard();
+  renderApprovals();
+  renderTasks();
+  renderWorkflows();
+  renderSpend();
+  updateApprovalBadge();
+}
+
+function renderDashboard() {
+  document.getElementById('s-done').textContent = tasks.filter(t=>t.status==='done').length;
+  document.getElementById('s-prog').textContent = tasks.filter(t=>t.status==='in-progress').length;
+  document.getElementById('s-todo').textContent = tasks.filter(t=>t.status==='todo').length;
+  document.getElementById('s-spend').textContent = '€'+spendData.daily.toFixed(2);
+
+  let show = tasks;
+  if (dashAgentFilter !== 'all') show = show.filter(t => t.agent === dashAgentFilter);
+  const active = show.filter(t => t.status !== 'done').slice(0,8);
+  const recent = show.filter(t => t.status === 'done').slice(-3);
+  const combined = [...active, ...recent];
+  document.getElementById('dash-tasks').innerHTML = combined.length
+    ? combined.map(taskHTML).join('')
+    : '<div class="empty"><div class="empty-icon">✓</div>No tasks for this filter</div>';
+}
+
+function taskHTML(t) {
+  const dateTimeStr = t.time ? new Date(t.time).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '';
+  return `
+  <div class="task ${t.status}" onclick="cycleStatus(${t.id})">
+    <div class="task-cb"></div>
+    <div class="task-body">
+      <div class="task-n">${t.name}</div>
+      <div class="task-row">
+        <span class="pill pill-${t.agent}">${t.agent}</span>
+        <span class="pill pill-${t.status}">${t.status.replace('-',' ')}</span>
+        ${dateTimeStr ? `<span class="task-time">${dateTimeStr}</span>` : ''}
+        ${t.cost > 0 ? `<span class="task-cost">€${t.cost.toFixed(2)}</span>` : ''}
+      </div>
+      ${t.output && t.status === 'done' ? `<div class="task-out">${t.output}</div>` : ''}
+    </div>
+  </div>`;
+}
+
+function renderTasks() {
+  let filtered = taskFilter === 'all' ? tasks : tasks.filter(t=>t.status===taskFilter);
+  if (agentFilter !== 'all') filtered = filtered.filter(t => t.agent === agentFilter);
+  if (!filtered.length) {
+    document.getElementById('all-tasks').innerHTML = '<div class="empty">No tasks in this filter</div>';
+    return;
+  }
+  const phases = [...new Set(filtered.map(t=>t.phase))];
+  let html = '';
+  phases.forEach(p => {
+    html += `<div class="phase-div">${p}</div>`;
+    filtered.filter(t=>t.phase===p).forEach(t => html += taskHTML(t));
+  });
+  document.getElementById('all-tasks').innerHTML = html;
+}
+
+function renderApprovals() {
+  let filtered = approvalFilter === 'all' ? approvals : approvals.filter(a=>a.status===approvalFilter);
+  if (approvalAgentFilter !== 'all') filtered = filtered.filter(a => a.agent === approvalAgentFilter);
+  if (!filtered.length) {
+    document.getElementById('approvals-list').innerHTML = `
+      <div class="empty">
+        <div class="empty-icon">🎉</div>
+        ${approvalFilter === 'pending' ? 'No pending approvals — inbox zero!' : 'No approvals in this filter'}
+      </div>`;
+    return;
+  }
+  document.getElementById('approvals-list').innerHTML = filtered.map(approvalHTML).join('');
+}
+
+function approvalHTML(a) {
+  const timeStr = new Date(a.time).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+  const btns = a.status === 'pending'
+    ? `<input class="reject-input" id="ri-${a.id}" placeholder="Reason for rejection (optional)..." />
+       <div class="appr-btns">
+         <button class="btn-approve" onclick="approveItem(${a.id})">✓ Approve</button>
+         <button class="btn-reject" onclick="toggleReject(${a.id})">✕ Reject</button>
+         ${a.imageRef ? `<button class="btn-view" onclick="viewImage(${a.id})">👁</button>` : ''}
+       </div>`
+    : a.status === 'approved'
+      ? `<div class="approved-badge">✓ Approved</div>`
+      : `<div class="rejected-badge">✕ Rejected${a.note ? ' — ' + a.note : ''}</div>`;
+
+  return `
+  <div class="approval-card ${a.status}" id="ac-${a.id}">
+    <div class="appr-hdr">
+      <div>
+        <div class="appr-type">${a.type}</div>
+        <div class="appr-title">${a.title}</div>
+      </div>
+      <div class="appr-time">${timeStr}</div>
+    </div>
+    <div class="appr-body">
+      <div class="appr-preview">${a.preview}</div>
+      <div class="appr-meta">
+        <span class="pill pill-${a.agent}">${a.agent}</span>
+        <span class="pill pill-${a.status==='pending'?'in-progress':a.status==='approved'?'done':'blocked'}">${a.status}</span>
+        ${a.platform ? `<span class="pill pill-jur">${a.platform}</span>` : ''}
+      </div>
+      ${btns}
+    </div>
+  </div>`;
+}
+
+function renderWorkflows() {
+  document.getElementById('wf-grid').innerHTML = workflows.map(w => `
+    <div class="wf-card" onclick="toggleWf('${w.id}')">
+      <div class="wf-name">${w.name}</div>
+      <div class="wf-id">${w.id === 'building' ? 'Building...' : w.id === 'pending' ? 'Pending' : w.id}</div>
+      <div class="wf-status">
+        <div class="ws ws-${w.status === 'active' ? 'active' : w.status === 'building' ? 'building' : 'inactive'}"></div>
+        <span style="color:var(--ink-mid)">${w.status === 'active' ? 'Active' : w.status === 'building' ? 'Building' : 'Inactive'}</span>
+      </div>
+    </div>`).join('');
+}
+
+function renderSpend() {
+  const dp = Math.min((spendData.daily/5)*100,100);
+  const mp = Math.min((spendData.monthly/100)*100,100);
+  document.getElementById('daily-amt').textContent = `€${spendData.daily.toFixed(2)} / €5.00`;
+  document.getElementById('monthly-amt').textContent = `€${spendData.monthly.toFixed(2)} / €100.00`;
+  const db = document.getElementById('daily-bar');
+  db.style.width = dp+'%';
+  dp > 60 ? db.classList.add('warn') : db.classList.remove('warn');
+  document.getElementById('monthly-bar').style.width = mp+'%';
+
+  const log = document.getElementById('spend-log');
+  if (!spendData.log.length) {
+    log.innerHTML = '<div class="empty">No spend logged yet</div>';
+    return;
+  }
+  log.innerHTML = spendData.log.slice().reverse().map(s=>`
+    <div class="task todo" style="cursor:default">
+      <div class="task-cb" style="border-color:var(--gold-border);background:var(--gold-light)"></div>
+      <div class="task-body">
+        <div class="task-n">${s.label}</div>
+        <div class="task-row">
+          <span class="pill pill-${s.agent||'john'}">${s.agent||'john'}</span>
+          <span class="task-time">${new Date(s.time).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>
+          <span class="task-cost" style="color:var(--gold);font-weight:700">€${s.amount.toFixed(3)}</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function updateApprovalBadge() {
+  const pending = approvals.filter(a=>a.status==='pending').length;
+  const badge = document.getElementById('approval-count');
+  badge.textContent = pending;
+  badge.style.display = pending > 0 ? 'inline-flex' : 'none';
+}
+
+// ── INTERACTIONS ──────────────────────────────────────────────────
+function cycleStatus(id) {
+  const order = ['todo','in-progress','done','blocked'];
+  const t = tasks.find(t=>t.id===id);
+  if (!t) return;
+  const i = order.indexOf(t.status);
+  t.status = order[(i+1)%order.length];
+  if (t.status === 'done') t.time = new Date().toISOString();
+  save(); renderAll();
+  showToast(t.name.substring(0,28) + '… → ' + t.status.replace('-',' '));
+}
+
+function approveItem(id) {
+  const a = approvals.find(a=>a.id===id);
+  if (!a) return;
+  a.status = 'approved';
+  save(); renderAll();
+  showToast('Approved: ' + a.title.substring(0,30));
+}
+
+function toggleReject(id) {
+  const ri = document.getElementById('ri-'+id);
+  if (!ri) return;
+  if (ri.classList.contains('open')) {
+    const reason = ri.value.trim();
+    const a = approvals.find(a=>a.id===id);
+    if (a) { a.status = 'rejected'; a.note = reason; }
+    save(); renderAll();
+    showToast('Rejected: ' + (approvals.find(a=>a.id===id)||{title:''}).title?.substring(0,25));
+  } else {
+    ri.classList.add('open');
+    ri.focus();
+  }
+}
+
+function viewImage(id) {
+  const a = approvals.find(a=>a.id===id);
+  showToast('Image ref: ' + (a?.imageRef || 'none'));
+}
+
+function toggleWf(id) {
+  const w = workflows.find(w=>w.id===id);
+  if (!w || w.id==='building'||w.id==='pending') return;
+  w.status = w.status === 'active' ? 'inactive' : 'active';
+  save(); renderWorkflows();
+  showToast(w.name + ' → ' + w.status);
+}
+
+function openAddForm() {
+  document.getElementById('add-form').classList.add('open');
+  setTimeout(()=>document.getElementById('nt-name').focus(), 100);
+}
+
+function closeAddForm() {
+  document.getElementById('add-form').classList.remove('open');
+}
+
+function addTask() {
+  const name = document.getElementById('nt-name').value.trim();
+  if (!name) return;
+  tasks.push({
+    id: Date.now(),
+    name,
+    status: document.getElementById('nt-status').value,
+    agent: document.getElementById('nt-agent').value,
+    phase: document.getElementById('nt-phase').value,
+    output: document.getElementById('nt-output').value.trim(),
+    cost: 0,
+    time: new Date().toISOString()
+  });
+  document.getElementById('nt-name').value = '';
+  document.getElementById('nt-output').value = '';
+  closeAddForm();
+  save(); renderAll();
+  showToast('Task added');
+}
+
+function filterTasks(f, btn) {
+  taskFilter = f;
+  document.querySelectorAll('#view-tasks .status-filters .f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+function filterTasksAgent(f, btn) {
+  agentFilter = f;
+  document.querySelectorAll('#view-tasks .agent-filters .f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+function filterApprovals(f, btn) {
+  approvalFilter = f;
+  document.querySelectorAll('#view-approvals .status-filters .f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderApprovals();
+}
+
+function filterApprovalsAgent(f, btn) {
+  approvalAgentFilter = f;
+  document.querySelectorAll('#view-approvals .agent-filters .f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderApprovals();
+}
+
+function filterDashAgent(f, btn) {
+  dashAgentFilter = f;
+  document.querySelectorAll('#view-dashboard .agent-filters .f-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderDashboard();
+}
+
+function addSpend() {
+  const label = prompt('Label (e.g. RunPod batch):');
+  if (!label) return;
+  const amt = parseFloat(prompt('Amount €:'));
+  if (isNaN(amt)) return;
+  spendData.daily += amt;
+  spendData.monthly += amt;
+  spendData.log.push({ label, amount: amt, agent: 'runpod', time: new Date().toISOString() });
+  save(); renderAll();
+  showToast('Logged: €' + amt.toFixed(3));
+}
+
+function addTestApproval() {
+  approvals.unshift({
+    id: Date.now(),
+    type: 'Content Post',
+    title: 'Instagram — Test Post',
+    status: 'pending',
+    agent: 'john',
+    platform: 'Instagram',
+    preview: 'Still here. Okay.\n\n#femaleengineer #hamburg #porsche911',
+    imageRef: 'scene_07_test',
+    time: new Date().toISOString(),
+    note: ''
+  });
+  save(); renderAll(); switchTab('approvals');
+  showToast('Test approval added');
+}
+
+function switchTab(tab) {
+  const tabs = ['dashboard','approvals','tasks','workflows','spend'];
+  document.querySelectorAll('.nav-tab').forEach((t,i)=>t.classList.toggle('active', tabs[i]===tab));
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+tab).classList.add('active');
+  renderAll();
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────
+document.getElementById('today-date').textContent = new Date().toLocaleDateString('en-GB',{
+  weekday:'long', day:'numeric', month:'long', year:'numeric'
+});
+
+load();
+renderAll();
+</script>
+</body>
+</html>
