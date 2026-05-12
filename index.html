@@ -878,6 +878,21 @@ body {
 <div class="toast" id="toast"></div>
 
 <script>
+// PASSWORD GATE
+(function() {
+  const PASS = "AISQUAD2026";
+  const KEY = "sq_auth";
+  if (sessionStorage.getItem(KEY) !== "ok") {
+    document.body.style.display = "none";
+    const pwd = prompt("AI-SQUAD OPS — Enter password:");
+    if (pwd === PASS) {
+      sessionStorage.setItem(KEY, "ok");
+      document.body.style.display = "";
+    } else {
+      document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif;color:#999;font-size:14px;">Access denied.</div>';
+    }
+  }
+})();
 // ── STORAGE (in-memory with localStorage persistence) ─────────────
 let tasks = [], approvals = [], workflows = [], spendData = { daily: 0, monthly: 0, log: [] };
 let taskFilter = 'all', approvalFilter = 'all', agentFilter = 'all', dashAgentFilter = 'all', approvalAgentFilter = 'all';
